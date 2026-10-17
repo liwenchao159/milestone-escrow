@@ -1,0 +1,12 @@
+{
+  "name": "order-service",
+  "version": "1.0.0",
+  "description": "被验收的交付物：一个真实的订单计算服务",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node src/server.js",
+    "test": "node test/run-tests.js"
+  },
+  "dependencies": {},
+  "devDependencies": {}
+}

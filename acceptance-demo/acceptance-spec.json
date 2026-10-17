@@ -1,0 +1,147 @@
+{
+  "_comment": "验收规格 —— 签约时由甲乙双方确认，哈希写入链上后不可单方变更。中间件声明与种子数据同样锁定。",
+  "acceptanceSpecVersion": "2.0.0",
+  "delivery": {
+    "name": "订单计算服务（依赖数据库 + 缓存）",
+    "repo": "git@github.com:freelancer/order-service.git",
+    "entryPoint": "src/order.js",
+    "serveCommand": "src/server.js"
+  },
+  "middleware": {
+    "_comment": "交付物声明的中间件依赖。平台负责提供这些服务，交付物只需说清需要什么。",
+    "requires": [
+      "postgres",
+      "redis"
+    ],
+    "notes": "交付物通过 src/runtime-bridge.js 访问，平台负责注入连接"
+  },
+  "seed": {
+    "_comment": "种子数据 —— 来自锁定的规格，乙方无法篡改。这保证验收起点双方一致。",
+    "tables": [
+      {
+        "table": "orders",
+        "rows": [
+          {
+            "id": "A001",
+            "items_json": "[{\"sku\":\"P1\",\"name\":\"键盘\",\"price\":29900,\"qty\":1},{\"sku\":\"P2\",\"name\":\"鼠标\",\"price\":9900,\"qty\":2}]",
+            "discount_rule": "VIP10",
+            "status": "created"
+          },
+          {
+            "id": "A002",
+            "items_json": "[{\"sku\":\"P3\",\"name\":\"显示器\",\"price\":129900,\"qty\":1}]",
+            "discount_rule": "NONE",
+            "status": "created"
+          }
+        ]
+      }
+    ],
+    "schema": [
+      {
+        "note": "订单表 —— 平台按锁定规格创建，乙方无权修改结构"
+      },
+      {
+        "statement": "CREATE TABLE IF NOT EXISTS orders (id VARCHAR(32) PRIMARY KEY, items_json TEXT NOT NULL, discount_rule VARCHAR(32) NOT NULL, status VARCHAR(16) NOT NULL DEFAULT 'created', created_at TIMESTAMP NOT NULL DEFAULT NOW())"
+      },
+      {
+        "note": "订单事件表"
+      },
+      {
+        "statement": "CREATE TABLE IF NOT EXISTS order_events (id SERIAL PRIMARY KEY, order_id VARCHAR(32) NOT NULL, event_type VARCHAR(32) NOT NULL, payload TEXT, created_at TIMESTAMP NOT NULL DEFAULT NOW())"
+      }
+    ]
+  },
+  "testCommand": {
+    "_comment": "由平台指定，乙方无法更改",
+    "command": "node",
+    "args": [
+      "test/run-tests.js",
+      "--suite=required"
+    ],
+    "timeoutMs": 60000,
+    "reportFormat": "json-stdout"
+  },
+  "requiredSuites": [
+    {
+      "group": "required",
+      "expectedCaseCount": 10
+    }
+  ],
+  "probe": {
+    "_comment": "平台自己启动服务并探测。接口地址由平台生成，乙方无法伪造。",
+    "targets": [
+      {
+        "path": "/health",
+        "method": "GET",
+        "expectStatus": [
+          200
+        ]
+      },
+      {
+        "path": "/orders",
+        "method": "GET",
+        "expectStatus": [
+          200
+        ]
+      },
+      {
+        "path": "/orders/A001",
+        "method": "GET",
+        "expectStatus": [
+          200
+        ]
+      },
+      {
+        "path": "/orders/A002",
+        "method": "GET",
+        "expectStatus": [
+          200
+        ]
+      },
+      {
+        "path": "/orders/NOTEXIST",
+        "method": "GET",
+        "expectStatus": [
+          404
+        ]
+      }
+    ],
+    "rounds": 5,
+    "intervalMs": 200,
+    "startupTimeoutMs": 15000
+  },
+  "contract": {
+    "_comment": "分母来自锁定契约，乙方多返回字段无法虚增覆盖率",
+    "responses": {
+      "/orders/A001": {
+        "required": [
+          "id",
+          "total",
+          "payable",
+          "currency",
+          "items"
+        ],
+        "optional": []
+      },
+      "/orders": {
+        "required": [
+          "items",
+          "count"
+        ],
+        "optional": []
+      }
+    }
+  },
+  "thresholds": {
+    "_comment": "与 web/assets/engine.js 的 standard-interface-v1 一致",
+    "testPassRate": 9000,
+    "apiAvailability": 9500,
+    "fieldCoverage": 9000,
+    "passScore": 80,
+    "weights": {
+      "test": 5000,
+      "api": 3000,
+      "field": 2000
+    }
+  }
+}

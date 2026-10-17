@@ -1,0 +1,172 @@
+{
+  "acceptanceSpecVersion": "2.0.0",
+  "delivery": {
+    "name": "汇率换算接口服务",
+    "repo": "git@github.com:yourname/fx-service.git",
+    "entryPoint": "src/fx.js",
+    "serveCommand": "src/server.js"
+  },
+  "middleware": {
+    "requires": [
+      "postgres"
+    ],
+    "notes": "汇率存数据库，热门币种走缓存。交付物通过 src/runtime-bridge.js 访问，平台负责注入"
+  },
+  "seed": {
+    "_comment": "种子数据来自锁定规格，乙方无法篡改。这保证验收起点双方一致。",
+    "schema": [
+      {
+        "statement": "CREATE TABLE IF NOT EXISTS fx_rates (base VARCHAR(8) NOT NULL, quote VARCHAR(8) NOT NULL, rate BIGINT NOT NULL, updated_at TIMESTAMP NOT NULL DEFAULT NOW(), PRIMARY KEY (base, quote))"
+      }
+    ],
+    "tables": [
+      {
+        "table": "fx_rates",
+        "rows": [
+          {
+            "base": "CNY",
+            "quote": "USD",
+            "rate": 13850
+          },
+          {
+            "base": "USD",
+            "quote": "CNY",
+            "rate": 72200
+          },
+          {
+            "base": "CNY",
+            "quote": "HKD",
+            "rate": 10850
+          },
+          {
+            "base": "HKD",
+            "quote": "CNY",
+            "rate": 92200
+          },
+          {
+            "base": "USD",
+            "quote": "HKD",
+            "rate": 7800
+          },
+          {
+            "base": "HKD",
+            "quote": "USD",
+            "rate": 12820
+          }
+        ]
+      }
+    ]
+  },
+  "testCommand": {
+    "_comment": "由平台指定，乙方无法更改。--suite=required 只跑必测组",
+    "command": "node",
+    "args": [
+      "test/run-tests.js",
+      "--suite=required"
+    ],
+    "timeoutMs": 30000,
+    "reportFormat": "json-stdout"
+  },
+  "requiredSuites": [
+    {
+      "group": "required",
+      "_comment": "这 12 条是验收时必须跑的用例，签约时确定。数量与名称都会被校验",
+      "expectedCaseCount": 12
+    }
+  ],
+  "probe": {
+    "_comment": "平台自己启动服务并探测。接口地址由平台生成，乙方无法伪造。",
+    "targets": [
+      {
+        "path": "/health",
+        "method": "GET",
+        "expectStatus": [
+          200
+        ]
+      },
+      {
+        "path": "/rates",
+        "method": "GET",
+        "expectStatus": [
+          200
+        ]
+      },
+      {
+        "path": "/rates/USD",
+        "method": "GET",
+        "expectStatus": [
+          200
+        ]
+      },
+      {
+        "path": "/rates/ZZZ",
+        "method": "GET",
+        "expectStatus": [
+          400
+        ]
+      },
+      {
+        "path": "/rates/ZZZ",
+        "method": "GET",
+        "expectStatus": [
+          400
+        ]
+      }
+    ],
+    "rounds": 5,
+    "intervalMs": 150,
+    "startupTimeoutMs": 15000
+  },
+  "contract": {
+    "_comment": "分母来自锁定契约，乙方多返回字段无法虚增覆盖率",
+    "responses": {
+      "/health": {
+        "required": [
+          "status",
+          "db"
+        ],
+        "optional": [
+          "ts",
+          "currencies"
+        ]
+      },
+      "/rates": {
+        "required": [
+          "items",
+          "count"
+        ],
+        "optional": []
+      },
+      "/rates/USD": {
+        "required": [
+          "base",
+          "quote",
+          "rate",
+          "spreadBps"
+        ],
+        "optional": [
+          "effectiveRate"
+        ]
+      },
+      "/rates/ZZZ": {
+        "required": [
+          "error"
+        ],
+        "optional": []
+      }
+    }
+  },
+  "thresholds": {
+    "_comment": "与 web/assets/engine.js 的 standard-interface-v1 一致",
+    "testPassRate": 9000,
+    "apiAvailability": 9500,
+    "fieldCoverage": 9000,
+    "passScore": 80,
+    "weights": {
+      "test": 5000,
+      "api": 3000,
+      "field": 2000
+    }
+  },
+  "_demoNote": "本样例在 src/server.js 里故意留了两个缺陷，用于演示验收平台如何发现：\n1. GET /rates/:base 在无汇率数据时返回 200 而非 404 —— 若在 probe.targets 中加入 {\"path\":\"/rates/JPY\",\"expectStatus\":[404]}，平台会检出并判不通过\n2. POST /quote 未预校验 amount 正负"
+}

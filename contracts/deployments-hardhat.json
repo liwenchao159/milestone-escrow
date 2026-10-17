@@ -1,0 +1,101 @@
+{
+  "network": "hardhat",
+  "chainId": "31337",
+  "deployedAt": "2026-10-17T06:16:43.872Z",
+  "contracts": {
+    "token": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+    "escrow": "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512",
+    "evaluator": "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0",
+    "arbitratorBot": "0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9"
+  },
+  "participants": {
+    "deployer": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+    "provider": "0x70997970C51812dc3A010C7d01b50e0d17dc79C8",
+    "arbitrator": "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
+    "collector": "0x90F79bf6EB2c4f870365E785982E1f101E93b906"
+  },
+  "participantMode": "hardhat 内置账户（可签名）",
+  "rules": [
+    {
+      "id": "standard-interface-v1",
+      "bytes32Id": "0x00000000000000000000007374616e646172642d696e746572666163652d7631",
+      "name": "标准接口开发",
+      "passThreshold": 80,
+      "required": [
+        9000,
+        9500,
+        9000
+      ],
+      "weights": [
+        5000,
+        3000,
+        2000
+      ]
+    },
+    {
+      "id": "data-pipeline-v1",
+      "bytes32Id": "0x00000000000000000000000000000000646174612d706970656c696e652d7631",
+      "name": "数据处理与管道",
+      "passThreshold": 78,
+      "required": [
+        9200,
+        8500,
+        9500
+      ],
+      "weights": [
+        3000,
+        2500,
+        4500
+      ]
+    },
+    {
+      "id": "strict-release-v1",
+      "bytes32Id": "0x0000000000000000000000000000007374726963742d72656c656173652d7631",
+      "name": "严格发布",
+      "passThreshold": 92,
+      "required": [
+        9800,
+        9900,
+        9800
+      ],
+      "weights": [
+        4500,
+        3500,
+        2000
+      ]
+    },
+    {
+      "id": "lightweight-doc-v1",
+      "bytes32Id": "0x00000000000000000000000000006c696768747765696768742d646f632d7631",
+      "name": "轻量技术文档",
+      "passThreshold": 75,
+      "required": [
+        9000,
+        8000,
+        9000
+      ],
+      "weights": [
+        2000,
+        1500,
+        6500
+      ]
+    },
+    {
+      "id": "balanced-4d-v1",
+      "bytes32Id": "0x00000000000000000000000000000000000062616c616e6365642d34642d7631",
+      "name": "均衡四维",
+      "passThreshold": 85,
+      "required": [
+        7000,
+        7000,
+        7000
+      ],
+      "weights": [
+        3000,
+        3000,
+        4000
+      ]
+    }
+  ],
+  "notice": "MockToken 为本地部署的测试代币，无任何真实价值或流通性"
+}

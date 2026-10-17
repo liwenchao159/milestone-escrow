@@ -1,0 +1,13 @@
+
+══════════════════════════════════════════════════════════════════
+  启动后端
+══════════════════════════════════════════════════════════════════
+  链上模式: mock · 规则 undefined 个
+  闭环: 登录 → 建项目/选规则 → 双签 → 注资 → 交付上传 → 客观验收 → 挑战期 → 结算支付
+
+══════════════════════════════════════════════════════════════════
+  ① 页面加载与登录
+══════════════════════════════════════════════════════════════════
+测试异常: Cannot read properties of undefined (reading 'document')
+    at $ (C:\Users\wbliwc\WorkBuddy\外包支付合约\milestone-escrow\web\test\platform-ui.test.js:67:30)
+    at main (C:\Users\wbliwc\WorkBuddy\外包支付合约\milestone-escrow\web\test\platform-ui.test.js:95:19)

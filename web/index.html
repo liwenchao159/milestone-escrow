@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>里程碑验收托管平台</title>
+<link rel="stylesheet" href="assets/platform.css">
+</head>
+<body>
+
+<div class="aurora" aria-hidden="true">
+  <span class="orb o1"></span><span class="orb o2"></span><span class="orb o3"></span>
+  <span class="grid-lines"></span><span class="noise"></span>
+</div>
+
+<!-- ══════════ 登录 ══════════ -->
+<section class="auth" id="authView">
+  <div class="auth-bg">
+    <div class="auth-copy">
+      <div class="badge-pill"><span class="dot-live"></span>验收环境实时可复现</div>
+      <h1 class="auth-title">验收不是<span class="grad">读代码</span><br>是<span class="grad">跑代码</span></h1>
+      <p class="auth-desc">
+        平台在隔离环境中真实运行交付物 —— 执行必测用例、拉起服务多轮探测、比对契约字段。
+        指标可复现，结论可复算，双方无法伪造。
+      </p>
+      <div class="auth-flow">
+        <div class="af-item"><b>1</b><span>选规则</span></div>
+        <div class="af-item"><b>2</b><span>双签</span></div>
+        <div class="af-item"><b>3</b><span>注资</span></div>
+        <div class="af-item hl"><b>4</b><span>客观验收</span></div>
+        <div class="af-item"><b>5</b><span>结算</span></div>
+      </div>
+      <div class="auth-trust">
+        <div class="at-item"><i style="--c:#4DA3FF"></i><span>平台自建隔离环境，不接受甲方提供的接口</span></div>
+        <div class="at-item"><i style="--c:#34D399"></i><span>必测组数量签约锁定，删用例会被当场发现</span></div>
+        <div class="at-item"><i style="--c:#A78BFA"></i><span>契约字段分母锁定，多返字段无法虚增</span></div>
+      </div>
+    </div>
+
+    <div class="auth-card">
+      <div class="ac-head">
+        <div class="ac-mark">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 4 7v10l8 5 8-5V7z"/><path d="M12 22V12"/><path d="m4 7 8 5 8-5"/></svg>
+        </div>
+        <div>
+          <h2>进入平台</h2>
+          <p>用钱包地址登录，无需密码</p>
+        </div>
+      </div>
+
+      <div class="ac-label">选择角色</div>
+      <div class="role-grid" id="roleGrid">
+        <button class="role sel" data-role="client" style="--c:#4DA3FF"><b>◈</b><span>甲方</span><em>出资方</em></button>
+        <button class="role" data-role="provider" style="--c:#34D399"><b>◆</b><span>乙方</span><em>承接方</em></button>
+        <button class="role" data-role="arbitrator" style="--c:#A78BFA"><b>⬢</b><span>仲裁者</span><em>独立第三方</em></button>
+        <button class="role" data-role="collector" style="--c:#FBBF24"><b>⬡</b><span>采集器</span><em>平台侧</em></button>
+      </div>
+
+      <div class="ac-label">钱包地址</div>
+      <div class="addr-row">
+        <input id="loginAddr" placeholder="0x…" spellcheck="false" autocomplete="off">
+        <button class="mini-btn" id="pasteBtn">粘贴</button>
+      </div>
+
+      <div class="ac-label">昵称<span class="opt">可选</span></div>
+      <input id="loginName" placeholder="显示名称">
+
+      <button class="btn-primary full" id="loginBtn">进入平台</button>
+
+      <div class="demo">
+        <div class="demo-t">Monad 测试网真实账户 · 点击填充</div>
+        <div class="demo-row">
+          <button class="demo-a" data-fill="0x2b0ECb4FFbCDbaA63E7F1f10c55bf2FF41F7D41E" data-role="client"><i style="--c:#4DA3FF"></i>甲方</button>
+          <button class="demo-a" data-fill="0x1Ee05feE9a57EfE79AC4f4ADBF3ACF8725c6F31f" data-role="provider"><i style="--c:#34D399"></i>乙方</button>
+          <button class="demo-a" data-fill="0xa0fb2D1274EeDe8CB4e9BC92b51481D69592b558" data-role="arbitrator"><i style="--c:#A78BFA"></i>仲裁</button>
+          <button class="demo-a" data-fill="0x2b0ECb4FFbCDbaA63E7F1f10c55bf2FF41F7D41E" title="采集者（链上已授权）" data-role="collector"><i style="--c:#FBBF24"></i>采集</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ 主应用 ══════════ -->
+<div class="app hidden" id="appView">
+  <!-- 侧边栏 -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sb-brand">
+      <div class="sb-mark">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 4 7v10l8 5 8-5V7z"/><path d="M12 22V12"/><path d="m4 7 8 5 8-5"/></svg>
+      </div>
+      <div class="sb-tx">
+        <div class="sb-name">里程碑托管</div>
+        <div class="sb-sub">Milestone Escrow</div>
+      </div>
+    </div>
+
+    <nav class="sb-nav" id="sbNav">
+      <div class="nav-g">总览</div>
+      <button class="nav-i on" data-page="dashboard" data-roles="client,provider,arbitrator,collector"><i>◈</i><span>工作台</span><em id="navBadgeDash"></em></button>
+      <button class="nav-i" data-page="projects" data-roles="client,provider,arbitrator,collector"><i>▤</i><span>我的项目</span></button>
+
+      <div class="nav-g">项目流程</div>
+      <button class="nav-i" data-page="rules" data-roles="client,provider,arbitrator,collector"><i>◫</i><span>验收规则库</span></button>
+      <button class="nav-i" data-page="create" data-roles="client"><i>＋</i><span>创建项目</span></button>
+      <button class="nav-i" data-page="delivery" data-roles="provider"><i>↑</i><span>交付提交</span></button>
+      <button class="nav-i" data-page="verify" data-roles="client,collector"><i>★</i><span>执行验收</span></button>
+      <button class="nav-i" data-page="settlement" data-roles="client,provider,arbitrator"><i>◈</i><span>资金结算</span></button>
+
+      <div class="nav-g">风险与信任</div>
+      <button class="nav-i" data-page="disputes" data-roles="client,provider,arbitrator"><i>⚖</i><span>争议仲裁</span><em id="navBadgeDisp"></em></button>
+      <button class="nav-i" data-page="trust" data-roles="client,provider,arbitrator,collector"><i>◐</i><span>信任机制</span></button>
+    </nav>
+
+    <div class="sb-foot">
+      <div class="sb-user">
+        <div class="su-av" id="sbAvatar">甲</div>
+        <div class="su-tx">
+          <div class="su-role" id="sbRole">甲方</div>
+          <div class="su-addr mono" id="sbAddr">0x0000…0000</div>
+        </div>
+      </div>
+      <button class="sb-out" id="logoutBtn" title="退出">
+        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/></svg>
+      </button>
+    </div>
+  </aside>
+
+  <div class="sb-mask" id="sbMask"></div>
+
+  <!-- 主内容 -->
+  <div class="content">
+    <header class="topbar">
+      <button class="menu-btn" id="menuBtn" aria-label="菜单">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+      </button>
+      <div class="tb-title">
+        <h1 id="pageTitle">工作台</h1>
+        <p id="pageDesc">你现在该处理的事</p>
+      </div>
+      <div class="tb-right">
+        <span class="chip" id="chainMode">检测中…</span>
+      </div>
+    </header>
+
+    <main class="pages" id="pages">
+
+      <!-- ─── 工作台 ─── -->
+      <section class="page on" id="page-dashboard">
+        <div class="kpi-row" id="kpiRow"></div>
+
+        <div class="grid-2">
+          <div class="panel">
+            <div class="p-h"><div class="p-n">▤</div><div><h2>待办事项</h2><p>按紧急程度排序</p></div></div>
+            <div class="todo-list" id="todoList"></div>
+          </div>
+          <div class="panel">
+            <div class="p-h"><div class="p-n">◈</div><div><h2>我的项目</h2><p>点击查看详情</p></div></div>
+            <div class="pl-list" id="dashProjects"></div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="p-h"><div class="p-n">◐</div><div><h2>资金概览</h2><p>所有项目汇总</p></div></div>
+          <div class="payout-bar" id="dashPayoutBar"></div>
+          <div class="payout-nums" id="dashPayoutNums"></div>
+        </div>
+      </section>
+
+      <!-- ─── 项目列表 ─── -->
+      <section class="page" id="page-projects">
+        <div class="panel">
+          <div class="p-h">
+            <div class="p-n">▤</div>
+            <div><h2>我的项目</h2><p>甲方与乙方视角的项目</p></div>
+            <div class="filters" id="projFilters">
+              <button class="filt on" data-f="all">全部</button>
+              <button class="filt" data-f="draft">待双签</button>
+              <button class="filt" data-f="funded">进行中</button>
+            </div>
+          </div>
+          <div class="pl-list" id="projList"></div>
+        </div>
+      </section>
+
+      <!-- ─── 项目详情 ─── -->
+      <section class="page" id="page-detail">
+        <div class="panel" id="detailHeader"></div>
+        <div class="panel">
+          <div class="p-h"><div class="p-n">◆</div><div><h2>里程碑</h2><p>每个里程碑独立锁定金额</p></div></div>
+          <div class="ms-grid" id="detailMs"></div>
+        </div>
+        <div class="panel">
+          <div class="p-h"><div class="p-n">◷</div><div><h2>审计轨迹</h2><p>全流程不可篡改记录</p></div></div>
+          <div class="audit-list" id="detailAudit"></div>
+        </div>
+      </section>
+
+      <!-- ─── 规则库 ─── -->
+      <section class="page" id="page-rules">
+        <div class="panel">
+          <div class="p-h">
+            <div class="p-n">◫</div>
+            <div><h2>验收规则库</h2><p>标准化模板，不可由甲方自定义 —— 这是防止任意改判定标准的关键</p></div>
+          </div>
+          <div class="rule-grid" id="ruleGrid"></div>
+        </div>
+
+        <div class="panel">
+          <div class="p-h"><div class="p-n warn">⊘</div><div><h2>平台不接什么</h2><p>诚实地划定能力边界</p></div></div>
+          <div class="reject-list" id="rejectList"></div>
+        </div>
+      </section>
+
+      <!-- ─── 创建项目 ─── -->
+      <section class="page" id="page-create">
+        <div class="panel">
+          <div class="p-h"><div class="p-n">＋</div><div><h2>创建项目</h2><p>配置里程碑与资金分配，生成锁定验收规格</p></div></div>
+
+          <div class="step-strip">
+            <div class="ss-i on"><b>1</b><span>基本信息</span></div>
+            <div class="ss-l"></div>
+            <div class="ss-i on"><b>2</b><span>里程碑分配</span></div>
+            <div class="ss-l"></div>
+            <div class="ss-i"><b>3</b><span>锁定规格</span></div>
+          </div>
+
+          <div class="grid-2">
+            <div class="fld"><label>项目名称</label><input id="cTitle" value="用户中心接口开发"></div>
+            <div class="fld"><label>适用规则</label>
+              <select id="cRule"></select>
+            </div>
+          </div>
+          <div class="grid-2">
+            <div class="fld"><label>乙方地址</label><input id="cProvider" placeholder="0x…" spellcheck="false"></div>
+            <div class="fld"><label>仲裁者地址<span class="opt">独立于甲乙双方</span></label><input id="cArb" placeholder="0x…" spellcheck="false"></div>
+          </div>
+
+          <div class="fld">
+            <label>里程碑与金额</label>
+            <div class="ms-list" id="cMsList"></div>
+            <button class="btn-ghost sm" id="cAddMs">+ 增加里程碑</button>
+            <div class="total-bar"><span>项目总额</span><b><span id="cTotal">100</span> <small>TUSD</small></b></div>
+          </div>
+
+          <div class="fld">
+            <label>备注<span class="opt">可选</span></label>
+            <textarea id="cNote" rows="2" placeholder="项目背景、交付要求等"></textarea>
+          </div>
+
+          <div class="p-actions">
+            <button class="btn-ghost" id="cBack">上一步</button>
+            <button class="btn-primary" id="createBtn">创建并锁定验收规格</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ─── 交付提交 ─── -->
+      <section class="page" id="page-delivery">
+        <div class="panel narrow">
+          <div class="p-h"><div class="p-n">↑</div><div><h2>上传交付物</h2><p>平台锁定文件哈希，验收时运行这份源码</p></div></div>
+
+          <div class="fld"><label>选择里程碑</label><select id="dMilestone"></select></div>
+
+          <div class="drop-zone" id="dropZone">
+            <input type="file" id="fileInput" accept=".zip,.tar,.gz,.tgz" hidden>
+            <div id="dzIdle">
+              <div class="dz-ico">
+                <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m17 8-5-5-5 5"/><path d="M12 3v12"/>
+                </svg>
+              </div>
+              <div class="dz-t">拖入源码压缩包，或<span class="dz-link">点击选择文件</span></div>
+              <div class="dz-s">支持 .zip / .tar.gz / .tgz，上限 50MB</div>
+            </div>
+            <div class="dz-file hidden" id="dzFile">
+              <div class="dzf-ico">PKG</div>
+              <div class="dzf-tx">
+                <div class="dzf-name" id="dzName"></div>
+                <div class="dzf-meta"><span id="dzSize"></span></div>
+              </div>
+              <button class="dzf-clear" id="dzClear" title="移除">✕</button>
+            </div>
+            <div class="dz-progress hidden" id="dzProgress">
+              <div class="dzp-bar"><i id="dzpBar"></i></div>
+              <div class="dzp-tx" id="dzpTx">上传中…</div>
+            </div>
+          </div>
+
+          <div class="fld"><label>交付说明<span class="opt">可选</span></label><textarea id="dNote" rows="2" placeholder="本次交付内容说明"></textarea></div>
+
+          <div class="hidden" id="upResult"></div>
+
+          <div class="privacy-note">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+            <div><b>链上只记录文件 SHA-256 与本地指针，源码不落链。</b><br>
+            平台会校验磁盘文件哈希是否仍与链上一致，不一致则拒绝验收 —— 你提交的正是被验收的那份代码。</div>
+          </div>
+
+          <div class="p-actions">
+            <button class="btn-primary" id="deliverBtn" disabled>上传并提交交付</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ─── 执行验收（核心页） ─── -->
+      <section class="page" id="page-verify">
+        <div class="panel">
+          <div class="p-h">
+            <div class="p-n accent">★</div>
+            <div><h2>执行客观验收</h2><p>平台在隔离环境真实运行交付物 —— 指标是跑出来的，不是读出来的</p></div>
+          </div>
+
+          <div class="verify-bar">
+            <div class="fld inline"><label>里程碑</label><select id="vMilestone"></select></div>
+            <button class="btn-primary" id="verifyBtn">开始验收</button>
+          </div>
+
+          <div class="env-strip">
+            <div class="es-i"><b>隔离运行时</b><span>每项目独立 PG + KV</span></div>
+            <div class="es-i"><b>锁定种子数据</b><span>来自签约规格</span></div>
+            <div class="es-i"><b>必测命令</b><span>平台指定，乙方不可改</span></div>
+            <div class="es-i"><b>事实哈希</b><span>任何人可复算</span></div>
+          </div>
+
+          <div class="pipeline hidden" id="pipe"></div>
+          <div id="verifyResult"></div>
+        </div>
+      </section>
+
+      <!-- ─── 资金结算 ─── -->
+      <section class="page" id="page-settlement">
+        <div class="panel">
+          <div class="p-h"><div class="p-n">◈</div><div><h2>资金结算</h2><p>款项全程托管，验收通过才放行</p></div></div>
+          <div class="payout-bar lg" id="setPayoutBar"></div>
+          <div class="payout-nums" id="setPayoutNums"></div>
+        </div>
+
+        <div class="panel">
+          <div class="p-h">
+            <div class="p-n">▦</div><div><h2>结算流水</h2><p>每笔都可追溯到链上交易</p></div>
+            <div class="filters" id="setFilter"><button class="filt on" data-s="all">全部</button><button class="filt" data-s="release">放款</button><button class="filt" data-s="refund">退款</button><button class="filt" data-s="arbitration">仲裁分配</button></div>
+          </div>
+          <div class="settle-list" id="settleList"></div>
+        </div>
+      </section>
+
+      <!-- ─── 争议仲裁 ─── -->
+      <section class="page" id="page-disputes">
+        <div class="panel">
+          <div class="p-h"><div class="p-n vio">⚖</div><div><h2>争议与仲裁</h2><p>挑战期机制 · 独立第三方裁定</p></div></div>
+          <div class="dispute-list" id="disputeList"></div>
+        </div>
+
+        <div class="panel">
+          <div class="p-h"><div class="p-n">◐</div><div><h2>仲裁规则</h2><p>裁定依据完全公开</p></div></div>
+          <div class="rule-list">
+            <div class="rl"><b>1</b><div><strong>挑战期</strong><span>验收通过后进入 3 天挑战期，逾期自动可放款</span></div></div>
+            <div class="rl"><b>2</b><div><strong>仲裁者独立</strong><span>必须在签约时指定，且不能是甲方或乙方</span></div></div>
+            <div class="rl"><b>3</b><div><strong>按比例分配</strong><span>仲裁者可裁定 0–10000 万分比，链上按比例结算</span></div></div>
+            <div class="rl"><b>4</b><div><strong>不推翻客观事实</strong><span>三维度实测值不可篡改，仲裁只决定分配比例</span></div></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ─── 信任机制 ─── -->
+      <section class="page" id="page-trust">
+        <div class="panel">
+          <div class="p-h"><div class="p-n">◐</div><div><h2>信任从哪来</h2><p>不靠相信任何一方，靠机制让作弊无利可图</p></div></div>
+          <div class="trust-grid">
+            <div class="tg">
+              <div class="tg-ico" style="--c:#4DA3FF">◫</div>
+              <h3>规格签约锁定</h3>
+              <p>验收规则在乙方写代码之前就确定，哈希上链。甲方无法事后把必测用例从 100 条缩到 3 条。</p>
+            </div>
+            <div class="tg">
+              <div class="tg-ico" style="--c:#34D399">⚙</div>
+              <h3>平台自建环境</h3>
+              <p>验收在平台自己的沙箱里跑。没有「甲方提供接口地址」这种配置项，假接口这条路从架构上就不存在。</p>
+            </div>
+            <div class="tg">
+              <div class="tg-ico" style="--c:#A78BFA">◐</div>
+              <h3>事实可复算</h3>
+              <p>事实报告哈希上链。任何人用同一 commit + 同一规格重跑，都能得到完全一致的结论。</p>
+            </div>
+            <div class="tg">
+              <div class="tg-ico" style="--c:#FBBF24">⊘</div>
+              <h3>能力边界清晰</h3>
+              <p>设计稿、观点类交付一律不接。测不了的东西不假装能测 —— 这是可信度的前提。</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="p-h"><div class="p-n warn">◑</div><div><h2>我们测不了什么</h2><p>诚实说明局限，比夸大能力更重要</p></div></div>
+          <div class="limit-list">
+            <div class="li"><b>代码可维护性与架构</b><span>需要人工评审，自动化测不出"写得漂不漂亮"</span></div>
+            <div class="li"><b>规格清单外的场景</b><span>平台只测双方约定清单内的接口与用例，这是双方的责任</span></div>
+            <div class="li"><b>性能与容量</b><span>需另配压测环境。内存数据库测不出真实数据库的性能特征</span></div>
+            <div class="li"><b>隐藏后门与恶意逻辑</b><span>只能辅以静态扫描与人工审计，无法完全自动化</span></div>
+            <div class="li"><b>主观质量判断</b><span>用户体验、文案、设计感 —— 无客观标准，强行量化就退化成 AI 主观判定</span></div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="p-h"><div class="p-n">◱</div><div><h2>技术实现要点</h2><p>验收环境如何支持依赖数据库的交付物</p></div></div>
+          <div class="tech-grid">
+            <div class="tech"><b>隔离运行时</b><span>pg-mem 内存 PostgreSQL + 内存 KV（Redis 常用命令实现）。每个项目一份，互不可见。</span></div>
+            <div class="tech"><b>进程注入</b><span>global 变量无法跨进程传递，改用 <code>--require</code> 加载器在子进程内部注入运行时。</span></div>
+            <div class="tech"><b>种子数据传递</b><span>父子进程内存不共享，种子数据写成 JSON 快照，由加载器在子进程导入并 await 完成。</span></div>
+            <div class="tech"><b>协议解耦</b><span>交付物只连标准协议，不关心背后真假。生产环境把 runtime-bridge 换成真 pg / ioredis 即可。</span></div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<div id="busy"><div class="busy-in"><div class="spinner"></div><span id="busyTx">处理中…</span></div></div>
+<div id="toasts"></div>
+
+<script src="assets/app.js"></script>
+</body>
+</html>

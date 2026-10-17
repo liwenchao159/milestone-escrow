@@ -1,0 +1,29 @@
+{
+  "name": "milestone-escrow-server",
+  "version": "1.0.0",
+  "description": "验收规则引擎与链上编排服务",
+  "license": "MIT",
+  "type": "commonjs",
+  "scripts": {
+    "dev": "ts-node src/index.ts",
+    "start": "node dist/index.js",
+    "build": "tsc"
+  },
+  "dependencies": {
+    "better-sqlite3": "^13.0.3",
+    "cors": "^2.8.5",
+    "dotenv": "^18.0.8",
+    "ethers": "^6.13.2",
+    "express": "^4.21.1",
+    "express-session": "^1.19.0",
+    "pg-mem": "^3.0.14",
+    "tar": "^7.5.22"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/express": "^4.17.21",
+    "@types/node": "^22.9.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.6.3"
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "name": "fx-service",
+  "version": "1.0.0",
+  "description": "汇率换算接口服务 —— 接口交付物参考样例",
+  "main": "src/fx.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "test": "node test/run-tests.js",
+    "test:required": "node test/run-tests.js --suite=required"
+  },
+  "dependencies": {},
+  "devDependencies": {},
+  "engines": {
+    "node": ">=18"
+  }
+}

@@ -1,0 +1,103 @@
+{
+  "network": "monad",
+  "chainId": "10143",
+  "deployedAt": "2026-10-17T10:40:13.717Z",
+  "contracts": {
+    "token": "0xbFD548f529e5F26f22c115409Ad81aA9766c6593",
+    "escrow": "0xcDe76c480F58a596f500112116bb3948FBDA17BF",
+    "evaluator": "0x292a9F3DAaCd63F81996C2089B0d11801aD2dB6a",
+    "arbitratorBot": "0xC6800D26f9Af33462D6A47b711444927F63A8597"
+  },
+  "participants": {
+    "deployer": "0x2b0ECb4FFbCDbaA63E7F1f10c55bf2FF41F7D41E",
+    "client": "0x2b0ECb4FFbCDbaA63E7F1f10c55bf2FF41F7D41E",
+    "provider": "0x1Ee05feE9a57EfE79AC4f4ADBF3ACF8725c6F31f",
+    "arbitrator": "0xC6800D26f9Af33462D6A47b711444927F63A8597",
+    "collector": "0x2b0ECb4FFbCDbaA63E7F1f10c55bf2FF41F7D41E"
+  },
+  "demoProviderKey": "f64301d260a2bc062277ca350086e05be1b1a6d7e4f7c3a85a8825127693e477",
+  "participantMode": "远端链：甲方=账户一，乙方=账户二，仲裁者=ArbitratorBot 合约",
+  "rules": [
+    {
+      "id": "standard-interface-v1",
+      "bytes32Id": "0x00000000000000000000007374616e646172642d696e746572666163652d7631",
+      "name": "标准接口开发",
+      "passThreshold": 80,
+      "required": [
+        9000,
+        9500,
+        9000
+      ],
+      "weights": [
+        5000,
+        3000,
+        2000
+      ]
+    },
+    {
+      "id": "data-pipeline-v1",
+      "bytes32Id": "0x00000000000000000000000000000000646174612d706970656c696e652d7631",
+      "name": "数据处理与管道",
+      "passThreshold": 78,
+      "required": [
+        9200,
+        8500,
+        9500
+      ],
+      "weights": [
+        3000,
+        2500,
+        4500
+      ]
+    },
+    {
+      "id": "strict-release-v1",
+      "bytes32Id": "0x0000000000000000000000000000007374726963742d72656c656173652d7631",
+      "name": "严格发布",
+      "passThreshold": 92,
+      "required": [
+        9800,
+        9900,
+        9800
+      ],
+      "weights": [
+        4500,
+        3500,
+        2000
+      ]
+    },
+    {
+      "id": "lightweight-doc-v1",
+      "bytes32Id": "0x00000000000000000000000000006c696768747765696768742d646f632d7631",
+      "name": "轻量技术文档",
+      "passThreshold": 75,
+      "required": [
+        9000,
+        8000,
+        9000
+      ],
+      "weights": [
+        2000,
+        1500,
+        6500
+      ]
+    },
+    {
+      "id": "balanced-4d-v1",
+      "bytes32Id": "0x00000000000000000000000000000000000062616c616e6365642d34642d7631",
+      "name": "均衡四维",
+      "passThreshold": 85,
+      "required": [
+        7000,
+        7000,
+        7000
+      ],
+      "weights": [
+        3000,
+        3000,
+        4000
+      ]
+    }
+  ],
+  "notice": "MockToken 为本地部署的测试代币，无任何真实价值或流通性"
+}
